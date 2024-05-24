@@ -15,6 +15,8 @@ import lombok.Setter;
         "username",
         "password"
 })
+//Esta clase representa una solicitud de inicio de sesión de un usuario.
+//Contiene el nombre de usuario y la contraseña necesarios para la autenticación.
 public class LoginUserRequest {
     @JsonProperty("username")
     private String username;

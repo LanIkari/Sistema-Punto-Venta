@@ -26,6 +26,8 @@ import java.security.SecureRandom;
 
 @Configuration
 @EnableWebSecurity
+//Esta clase configura la seguridad de la aplicación utilizando Spring Security.
+// Define la cadena de filtros de seguridad, el proveedor de autenticación y el codificador de contraseñas.
 public class SecurityConfiguration {
     @Autowired
     private UserDetailsService uds;
@@ -34,11 +36,14 @@ public class SecurityConfiguration {
     @Autowired
     private CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
+    // Configura la cadena de filtros de seguridad.
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
+                        // Permite el acceso sin autenticación a ciertas rutas.
                         .requestMatchers("/bootstrap/**","/css/**", "/favicon.ico","/", "/index", "/token" ,"/error").permitAll()
+                        // Requiere que el usuario tenga la autoridad "ADMIN" para acceder a ciertas rutas.
                         .requestMatchers(
                                 //ARTICULO
                                 "/articulo/alta-articulo",
@@ -74,17 +79,20 @@ public class SecurityConfiguration {
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
+                        // Configura la página de inicio de sesión y las URL de éxito.
                         .loginPage("/login")
                         .defaultSuccessUrl("/index")
                         .successForwardUrl("/login_success_handler")
                         .permitAll())
                 .logout(logout -> logout
+                        // Configura la URL de cierre de sesión y el manejador de éxito.
                         .logoutUrl("/doLogout")
                         .logoutSuccessUrl("/index")
-                        .deleteCookies("JSESSIONID") //NEW Cookies to clear
+                        .deleteCookies("JSESSIONID") // Borra la cookie de sesión.
                         .logoutSuccessHandler(customLogoutSuccessHandler)
                         .clearAuthentication(true)
                         .invalidateHttpSession(true))
+                // Añade el filtro de autenticación JWT después del filtro de autenticación de usuario y contraseña.
                 .addFilterAfter(new JWTAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
@@ -94,11 +102,13 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    // Configura el codificador de contraseñas.
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(11, new SecureRandom());
     }
 
+    // Configura el proveedor de autenticación.
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -107,10 +117,11 @@ public class SecurityConfiguration {
         return authenticationProvider;
     }
 
+    // Configura el administrador de autenticación.
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
             throws Exception {
-        //your AuthenticationProvider must return UserDetails object
+        // El proveedor de autenticación debe retornar un objeto UserDetails.
         return new ProviderManager(authenticationProvider());
     }
 }

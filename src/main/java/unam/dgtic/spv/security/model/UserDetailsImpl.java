@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.*;
 import java.util.stream.Collectors;
 
+//Implementa la interfaz UserDetails de Spring Security, proporcionando la información necesaria para la
+// autenticación y autorización del usuario.
 public class UserDetailsImpl implements UserDetails {
     private Integer id;
     private String name;
@@ -17,10 +19,12 @@ public class UserDetailsImpl implements UserDetails {
     private Map<String, Object> attributes;
     private Usuario usuario;
 
+    // Constructor que inicializa la instancia con un objeto Usuario.
     public UserDetailsImpl(Usuario usuario) {
         this.usuario = usuario;
     }
 
+    // Constructor que inicializa la instancia con parámetros específicos.
     public UserDetailsImpl(Integer id, String name, String email, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
@@ -28,6 +32,7 @@ public class UserDetailsImpl implements UserDetails {
         this.authorities = authorities;
     }
 
+    // Método estático para construir un UserDetailsImpl a partir de un objeto Usuario.
     public static UserDetailsImpl build(Usuario user) {
         List<GrantedAuthority> authorities = user.getUseInfoRoles().stream().map(role ->
                 new SimpleGrantedAuthority(role.getNombre())
@@ -40,6 +45,7 @@ public class UserDetailsImpl implements UserDetails {
         );
     }
 
+    // Obtiene las autoridades (roles) del usuario.
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (null == usuario.getUseInfoRoles()) {
@@ -52,74 +58,49 @@ public class UserDetailsImpl implements UserDetails {
         return grantedAuthorities;
     }
 
-    /**
-     * getUsername
-     * @return username
-     */
+    // Obtiene el nombre de usuario (correo electrónico).
     @Override
     public String getUsername() {
         return usuario.getEmail();
     }
 
-    /**
-     * getPassword (OTP)
-     * @return password
-     */
+    // Obtiene la contraseña del usuario.
     @Override
     public String getPassword() {
         return usuario.getPassword();
     }
 
-    /**
-     * getName
-     * @return name
-     */
+    // Obtiene el nombre completo del usuario.
     public String getName() {
         return usuario.getNombre();
     }
 
-    /**
-     * getEmail
-     * @return email
-     */
+    // Obtiene el correo electrónico del usuario.
     public String getEmail() {
         return usuario.getEmail();
     }
 
-    /**
-     * isEnabled
-     * @return if user is enabled
-     */
+    // Indica si el usuario está habilitado.
     @Override
     public boolean isEnabled() {
         return usuario.getActivo() == true;
     }
 
-    /**
-     * isAccountNonLocked
-     * @return if user is locked
-     */
+    // Indica si la cuenta del usuario no está bloqueada.
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
-    /**
-     * isAccountNonExpired
-     * @return if account is not expired
-     */
+    // Indica si la cuenta del usuario no ha expirado.
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    /**
-     * isCredentialsNonExpired
-     * @return if credential is not expired
-     */
+    // Indica si las credenciales del usuario no han expirado.
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
-
 }

@@ -47,7 +47,7 @@ public class RolController {
         rolService.guardar(rol);
         sesion.setComplete();
         flash.addFlashAttribute("success", "Rol guardado con éxito");
-        return "redirect:rol/alta-rol";
+        return "redirect:/rol/alta-rol";
     }
 
     @GetMapping("lista-rol")
